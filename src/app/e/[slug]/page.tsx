@@ -37,7 +37,7 @@ export default async function EmergencyPage({ params }: PageProps) {
 
         {/* Profile Header */}
         <div className="relative bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 text-white pt-8 pb-12 px-6">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"30\" height=\"30\" viewBox=\"0 0 30 30\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cpath d=\"M15 0v30M0 15h30\" stroke=\"%23ffffff\" stroke-opacity=\"0.03\" fill=\"none\"/%3E%3C/svg%3E')]"></div>
+          <div className="absolute inset-0 opacity-5 bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-[size:30px_30px]"></div>
           <div className="relative text-center">
             {/* Photo */}
             <div className="w-28 h-28 bg-gradient-to-br from-white/20 to-white/5 rounded-full mx-auto mb-4 flex items-center justify-center text-5xl font-light border-4 border-white/20 shadow-xl backdrop-blur">
