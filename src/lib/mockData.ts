@@ -1,0 +1,162 @@
+// Mock data for testing - will be replaced with Firebase data
+
+export interface EmergencyContact {
+  id: string;
+  name: string;
+  relationship: string;
+  phone: string;
+  isPrimary: boolean;
+}
+
+export interface Medication {
+  id: string;
+  name: string;
+  dosage: string;
+  frequency: string;
+}
+
+export interface Profile {
+  id: string;
+  slug: string;
+  name: string;
+  dateOfBirth: string;
+  photo?: string;
+  bloodType: string;
+  allergies: string[];
+  medicalConditions: string[];
+  medications: Medication[];
+  emergencyContacts: EmergencyContact[];
+  address: string;
+  specialInstructions?: string;
+  physicianName?: string;
+  physicianPhone?: string;
+  lastUpdated: string;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  createdAt: string;
+  trialEndsAt: string;
+  isPaid: boolean;
+  isAdmin: boolean;
+  profiles: Profile[];
+}
+
+// Test users
+export const mockUsers: User[] = [
+  {
+    id: '1',
+    email: 'admin',
+    name: 'Admin User',
+    createdAt: '2024-01-15',
+    trialEndsAt: '2025-02-15',
+    isPaid: true,
+    isAdmin: true,
+    profiles: [
+      {
+        id: 'p1',
+        slug: 'abc123def456ghi789jkl',
+        name: 'Tyler Rigley',
+        dateOfBirth: '2015-06-20',
+        bloodType: 'O+',
+        allergies: ['Peanuts', 'Penicillin'],
+        medicalConditions: ['Asthma'],
+        medications: [
+          { id: 'm1', name: 'Albuterol', dosage: '90mcg', frequency: 'As needed' }
+        ],
+        emergencyContacts: [
+          { id: 'c1', name: 'Wayne Rigley', relationship: 'Father', phone: '555-123-4567', isPrimary: true },
+          { id: 'c2', name: 'Sarah Rigley', relationship: 'Mother', phone: '555-234-5678', isPrimary: false }
+        ],
+        address: '123 Main Street, Anytown, USA 12345',
+        specialInstructions: 'Has an inhaler in backpack at all times.',
+        physicianName: 'Dr. Smith',
+        physicianPhone: '555-345-6789',
+        lastUpdated: '2024-12-20'
+      }
+    ]
+  },
+  {
+    id: '2',
+    email: 'john@example.com',
+    name: 'John Doe',
+    createdAt: '2024-12-01',
+    trialEndsAt: '2025-01-01',
+    isPaid: false,
+    isAdmin: false,
+    profiles: [
+      {
+        id: 'p2',
+        slug: 'xyz789abc123def456ghi',
+        name: 'Jane Doe',
+        dateOfBirth: '1985-03-15',
+        bloodType: 'A-',
+        allergies: [],
+        medicalConditions: ['Diabetes Type 2'],
+        medications: [
+          { id: 'm2', name: 'Metformin', dosage: '500mg', frequency: 'Twice daily' }
+        ],
+        emergencyContacts: [
+          { id: 'c3', name: 'John Doe', relationship: 'Husband', phone: '555-456-7890', isPrimary: true }
+        ],
+        address: '456 Oak Avenue, Somewhere, USA 67890',
+        lastUpdated: '2024-12-15'
+      }
+    ]
+  },
+  {
+    id: '3',
+    email: 'mary@example.com',
+    name: 'Mary Smith',
+    createdAt: '2024-12-20',
+    trialEndsAt: '2025-01-20',
+    isPaid: false,
+    isAdmin: false,
+    profiles: []
+  }
+];
+
+// Helper function to find user by email/password
+export function authenticateUser(email: string, password: string): User | null {
+  // Hardcoded test login
+  if (email === 'admin' && password === '1234') {
+    return mockUsers[0];
+  }
+  return null;
+}
+
+// Helper function to find profile by slug
+export function getProfileBySlug(slug: string): Profile | null {
+  for (const user of mockUsers) {
+    const profile = user.profiles.find(p => p.slug === slug);
+    if (profile) return profile;
+  }
+  return null;
+}
+
+// Helper function to calculate age from date of birth
+export function calculateAge(dateOfBirth: string): number {
+  const today = new Date();
+  const birthDate = new Date(dateOfBirth);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age;
+}
+
+// Helper function to check if trial is active
+export function isTrialActive(trialEndsAt: string): boolean {
+  return new Date(trialEndsAt) > new Date();
+}
+
+// Helper function to get days remaining in trial
+export function getDaysRemaining(trialEndsAt: string): number {
+  const end = new Date(trialEndsAt);
+  const now = new Date();
+  const diff = end.getTime() - now.getTime();
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+}
