@@ -192,10 +192,24 @@ export function registerUser(name: string, email: string, password: string): Use
 
 // Helper function to find profile by slug
 export function getProfileBySlug(slug: string): Profile | null {
+  // Check mock users first
   for (const user of mockUsers) {
     const profile = user.profiles.find(p => p.slug === slug);
     if (profile) return profile;
   }
+
+  // Check registered users in localStorage
+  if (typeof window !== 'undefined') {
+    const storedUsers = localStorage.getItem('registeredUsers');
+    if (storedUsers) {
+      const users = JSON.parse(storedUsers) as User[];
+      for (const user of users) {
+        const profile = user.profiles.find(p => p.slug === slug);
+        if (profile) return profile;
+      }
+    }
+  }
+
   return null;
 }
 
@@ -222,4 +236,95 @@ export function getDaysRemaining(trialEndsAt: string): number {
   const now = new Date();
   const diff = end.getTime() - now.getTime();
   return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+}
+
+// Generate a random slug for profile URLs
+function generateSlug(): string {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let slug = '';
+  for (let i = 0; i < 24; i++) {
+    slug += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return slug;
+}
+
+// Add a new profile for a user
+export function addProfile(userId: string, profileData: Omit<Profile, 'id' | 'slug' | 'lastUpdated'>): Profile | null {
+  if (typeof window === 'undefined') return null;
+
+  const newProfile: Profile = {
+    ...profileData,
+    id: `profile_${Date.now()}`,
+    slug: generateSlug(),
+    lastUpdated: new Date().toISOString().split('T')[0]
+  };
+
+  // Update current user in localStorage
+  const currentUser = localStorage.getItem('currentUser');
+  if (currentUser) {
+    const user = JSON.parse(currentUser) as User;
+    if (user.id === userId) {
+      user.profiles.push(newProfile);
+      localStorage.setItem('currentUser', JSON.stringify(user));
+    }
+  }
+
+  // Also update registered users if applicable
+  const storedUsers = localStorage.getItem('registeredUsers');
+  if (storedUsers) {
+    const users = JSON.parse(storedUsers);
+    const userIndex = users.findIndex((u: User) => u.id === userId);
+    if (userIndex !== -1) {
+      users[userIndex].profiles.push(newProfile);
+      localStorage.setItem('registeredUsers', JSON.stringify(users));
+    }
+  }
+
+  return newProfile;
+}
+
+// Update an existing profile
+export function updateProfile(userId: string, profileId: string, profileData: Partial<Profile>): Profile | null {
+  if (typeof window === 'undefined') return null;
+
+  let updatedProfile: Profile | null = null;
+
+  // Update current user in localStorage
+  const currentUser = localStorage.getItem('currentUser');
+  if (currentUser) {
+    const user = JSON.parse(currentUser) as User;
+    if (user.id === userId) {
+      const profileIndex = user.profiles.findIndex(p => p.id === profileId);
+      if (profileIndex !== -1) {
+        user.profiles[profileIndex] = {
+          ...user.profiles[profileIndex],
+          ...profileData,
+          lastUpdated: new Date().toISOString().split('T')[0]
+        };
+        updatedProfile = user.profiles[profileIndex];
+        localStorage.setItem('currentUser', JSON.stringify(user));
+      }
+    }
+  }
+
+  // Also update registered users if applicable
+  const storedUsers = localStorage.getItem('registeredUsers');
+  if (storedUsers) {
+    const users = JSON.parse(storedUsers);
+    const userIndex = users.findIndex((u: User) => u.id === userId);
+    if (userIndex !== -1) {
+      const profileIndex = users[userIndex].profiles.findIndex((p: Profile) => p.id === profileId);
+      if (profileIndex !== -1) {
+        users[userIndex].profiles[profileIndex] = {
+          ...users[userIndex].profiles[profileIndex],
+          ...profileData,
+          lastUpdated: new Date().toISOString().split('T')[0]
+        };
+        updatedProfile = users[userIndex].profiles[profileIndex];
+        localStorage.setItem('registeredUsers', JSON.stringify(users));
+      }
+    }
+  }
+
+  return updatedProfile;
 }

@@ -10,9 +10,9 @@ export default function Home() {
             <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
             <span className="text-red-500 text-sm font-medium">Life-saving information at their fingertips</span>
           </div>
+          <img src="/logo2.png" alt="Rescue Link ID" className="h-32 md:h-40 mx-auto mb-6" />
           <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-            Emergency Info That<br />
-            <span className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">Saves Lives</span>
+            Emergency Info That <span className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">Saves Lives</span>
           </h1>
           <p className="text-xl text-text-secondary mb-10 max-w-2xl mx-auto leading-relaxed">
             Create a secure emergency profile accessible via QR code. First responders get instant access to critical medical information - no app required.

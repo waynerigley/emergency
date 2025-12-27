@@ -125,12 +125,15 @@ export default function Dashboard() {
               <h2 className="text-2xl font-bold">Your Profiles</h2>
               <p className="text-text-secondary text-sm mt-1">Manage emergency profiles for you and your family</p>
             </div>
-            <button className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-xl transition-all shadow-lg shadow-red-600/25 hover:shadow-red-600/40 hover:-translate-y-0.5">
+            <Link
+              href="/profile/new"
+              className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-xl transition-all shadow-lg shadow-red-600/25 hover:shadow-red-600/40 hover:-translate-y-0.5"
+            >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
               Add Profile
-            </button>
+            </Link>
           </div>
 
           {user.profiles.length === 0 ? (
@@ -142,12 +145,15 @@ export default function Dashboard() {
               </div>
               <h3 className="text-xl font-semibold mb-2">No profiles yet</h3>
               <p className="text-text-secondary mb-6 max-w-sm mx-auto">Create your first emergency profile to get started protecting yourself and your loved ones</p>
-              <button className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-8 rounded-xl transition-all shadow-lg shadow-red-600/25 hover:shadow-red-600/40 hover:-translate-y-0.5">
+              <Link
+                href="/profile/new"
+                className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-8 rounded-xl transition-all shadow-lg shadow-red-600/25 hover:shadow-red-600/40 hover:-translate-y-0.5"
+              >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
                 Create Profile
-              </button>
+              </Link>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
