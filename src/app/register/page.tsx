@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { registerUser } from "@/lib/mockData";
 
 export default function Register() {
   const router = useRouter();
@@ -32,10 +33,16 @@ export default function Register() {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // TODO: Implement Firebase auth
-    // For now, just show success and redirect to login
-    alert("Registration successful! Please sign in with your new account.");
-    router.push("/login");
+    const user = registerUser(name, email, password);
+
+    if (user) {
+      // Auto-login the user
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      router.push("/dashboard");
+    } else {
+      setError("An account with this email already exists");
+      setLoading(false);
+    }
   };
 
   return (

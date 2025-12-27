@@ -48,7 +48,7 @@ export interface User {
 export const mockUsers: User[] = [
   {
     id: '1',
-    email: 'admin',
+    email: 'admin@rescuelinkid.com',
     name: 'Admin User',
     createdAt: '2024-01-15',
     trialEndsAt: '2025-02-15',
@@ -118,13 +118,76 @@ export const mockUsers: User[] = [
   }
 ];
 
+// Helper function to get all users (including from localStorage)
+export function getAllUsers(): User[] {
+  if (typeof window === 'undefined') return mockUsers;
+
+  const storedUsers = localStorage.getItem('registeredUsers');
+  if (storedUsers) {
+    const registered = JSON.parse(storedUsers) as User[];
+    return [...mockUsers, ...registered];
+  }
+  return mockUsers;
+}
+
 // Helper function to find user by email/password
 export function authenticateUser(email: string, password: string): User | null {
-  // Hardcoded test login
-  if (email === 'admin' && password === '1234') {
+  // Check admin first
+  if (email === 'admin@rescuelinkid.com' && password === 'admin123') {
     return mockUsers[0];
   }
+
+  // Check registered users in localStorage
+  if (typeof window !== 'undefined') {
+    const storedUsers = localStorage.getItem('registeredUsers');
+    if (storedUsers) {
+      const users = JSON.parse(storedUsers) as (User & { password: string })[];
+      const user = users.find(u => u.email === email && u.password === password);
+      if (user) {
+        const { password: _, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      }
+    }
+  }
+
   return null;
+}
+
+// Helper function to register a new user
+export function registerUser(name: string, email: string, password: string): User | null {
+  if (typeof window === 'undefined') return null;
+
+  // Check if email already exists
+  const allUsers = getAllUsers();
+  if (allUsers.some(u => u.email === email)) {
+    return null;
+  }
+
+  // Create new user
+  const trialEnd = new Date();
+  trialEnd.setDate(trialEnd.getDate() + 30);
+
+  const newUser: User & { password: string } = {
+    id: `user_${Date.now()}`,
+    email,
+    name,
+    password,
+    createdAt: new Date().toISOString().split('T')[0],
+    trialEndsAt: trialEnd.toISOString().split('T')[0],
+    isPaid: false,
+    isAdmin: false,
+    profiles: []
+  };
+
+  // Store in localStorage
+  const storedUsers = localStorage.getItem('registeredUsers');
+  const users = storedUsers ? JSON.parse(storedUsers) : [];
+  users.push(newUser);
+  localStorage.setItem('registeredUsers', JSON.stringify(users));
+
+  // Return user without password
+  const { password: _, ...userWithoutPassword } = newUser;
+  return userWithoutPassword;
 }
 
 // Helper function to find profile by slug

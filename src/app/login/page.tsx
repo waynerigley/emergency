@@ -33,7 +33,7 @@ export default function Login() {
         router.push('/dashboard');
       }
     } else {
-      setError("Invalid credentials. Try admin / 1234");
+      setError("Invalid email or password");
       setLoading(false);
     }
   };
@@ -75,7 +75,7 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-12 pr-4 py-3.5 bg-input-bg border border-input-border rounded-xl focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all"
-                placeholder="admin"
+                placeholder="Enter your email"
                 required
               />
             </div>
@@ -96,7 +96,7 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-12 pr-4 py-3.5 bg-input-bg border border-input-border rounded-xl focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all"
-                placeholder="1234"
+                placeholder="Enter your password"
                 required
               />
             </div>
@@ -128,12 +128,12 @@ export default function Login() {
           </p>
 
           <div className="mt-6 pt-6 border-t border-card-border">
-            <p className="text-text-tertiary text-xs text-center flex items-center justify-center gap-2">
+            <Link href="/forgot-password" className="text-text-secondary hover:text-red-500 text-sm flex items-center justify-center gap-2 transition-colors">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
               </svg>
-              Test credentials: admin / 1234
-            </p>
+              Forgot your password?
+            </Link>
           </div>
         </form>
       </div>

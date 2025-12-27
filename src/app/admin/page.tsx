@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { User, mockUsers, getDaysRemaining, isTrialActive } from "@/lib/mockData";
+import { User, getAllUsers, getDaysRemaining, isTrialActive } from "@/lib/mockData";
 
 export default function Admin() {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,6 +17,7 @@ export default function Admin() {
       const user = JSON.parse(storedUser);
       if (user.isAdmin) {
         setCurrentUser(user);
+        setUsers(getAllUsers());
       } else {
         router.push('/dashboard');
       }
@@ -47,10 +49,10 @@ export default function Admin() {
   if (!currentUser) return null;
 
   // Stats
-  const totalUsers = mockUsers.length;
-  const activeTrials = mockUsers.filter(u => !u.isPaid && isTrialActive(u.trialEndsAt)).length;
-  const paidUsers = mockUsers.filter(u => u.isPaid).length;
-  const totalProfiles = mockUsers.reduce((sum, u) => sum + u.profiles.length, 0);
+  const totalUsers = users.length;
+  const activeTrials = users.filter(u => !u.isPaid && isTrialActive(u.trialEndsAt)).length;
+  const paidUsers = users.filter(u => u.isPaid).length;
+  const totalProfiles = users.reduce((sum, u) => sum + u.profiles.length, 0);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[var(--gradient-from)] to-[var(--gradient-to)]">
@@ -159,7 +161,7 @@ export default function Admin() {
                 </tr>
               </thead>
               <tbody>
-                {mockUsers.map((user) => {
+                {users.map((user) => {
                   const trialActive = isTrialActive(user.trialEndsAt);
                   const daysLeft = getDaysRemaining(user.trialEndsAt);
 
