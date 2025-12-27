@@ -4,7 +4,33 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Emergency Info Platform - A Next.js application for creating shareable emergency information pages with QR codes. Currently in early development (UI-only stage, Firebase integration pending).
+Emergency Info Platform - A Next.js application for creating shareable emergency information pages with QR codes. First responders or bystanders scan a QR code (wallet card, phone case, medical bracelet) to instantly access critical medical and contact information - no app or login required to view.
+
+### Target Users
+- Elderly individuals who may get lost
+- Anyone with medical conditions
+- Parents creating profiles for children
+
+### Business Model
+- 30-day free trial (no credit card, all features available)
+- $40/year subscription
+- Manual payment process (e-transfer/EMT) - payment page TBD
+
+### Core User Features
+- Primary contact info, emergency contacts, address
+- Medications and medical information
+- QR code generation with unique unguessable URLs
+- Printable/laminatable wallet cards
+
+### Admin Features
+- Admin panel to manage users and trials
+- User contact form (EmailJS planned)
+- Version number displayed on site
+
+### Security Requirements
+- All data encrypted at rest
+- Information page explaining security measures
+- URLs must be unguessable (20+ character slugs)
 
 ## Commands
 
@@ -25,11 +51,14 @@ npm run lint     # Run ESLint
 ## Architecture
 
 ### Routing Structure
-- `/` - Landing page (server component)
+- `/` - Landing page with login section + info button (server component)
 - `/login` - Login form (client component)
 - `/register` - Registration form (client component)
-- `/dashboard` - User dashboard (not yet implemented)
-- `/e/[slug]` - Public emergency page (not yet implemented)
+- `/dashboard` - User dashboard to manage profiles (not yet implemented)
+- `/e/[slug]` - Public emergency page, no auth required (not yet implemented)
+- `/info` - Features and security information page (not yet implemented)
+- `/admin` - Admin panel for user/trial management (not yet implemented)
+- `/payment` - Subscription payment info page (not yet implemented)
 
 ### Component Patterns
 - Server components are default; use `"use client"` directive for interactive pages
