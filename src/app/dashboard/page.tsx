@@ -78,7 +78,7 @@ export default function Dashboard() {
                 ) : (
                   <>
                     <p className="font-semibold text-red-400">Trial Expired</p>
-                    <p className="text-text-secondary text-sm">Upgrade to continue using Emergency Info</p>
+                    <p className="text-text-secondary text-sm">Upgrade to continue using Rescue Link ID</p>
                   </>
                 )}
               </div>

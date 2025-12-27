@@ -196,7 +196,7 @@ export default async function EmergencyPage({ params }: PageProps) {
           {/* Footer */}
           <div className="text-center py-4">
             <p className="text-slate-400 text-xs">
-              Powered by Emergency Info
+              Powered by Rescue Link ID
             </p>
           </div>
         </div>

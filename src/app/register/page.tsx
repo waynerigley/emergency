@@ -42,7 +42,7 @@ export default function Register() {
     <div className="min-h-screen bg-gradient-to-b from-[var(--gradient-from)] to-[var(--gradient-to)] flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="text-4xl">🚨</Link>
+          <Link href="/" className="text-4xl">🔗</Link>
           <h1 className="text-2xl font-bold mt-4">Create Account</h1>
           <p className="text-text-secondary mt-2">Start your free 30-day trial</p>
         </div>

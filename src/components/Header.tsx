@@ -30,8 +30,8 @@ export function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <span className="text-2xl">🚨</span>
-            <span className="font-bold text-lg">Emergency Info</span>
+            <span className="text-2xl">🔗</span>
+            <span className="font-bold text-lg">Rescue Link ID</span>
             <span className="text-xs bg-red-600 text-white px-2 py-0.5 rounded-full">
               v{VERSION}
             </span>

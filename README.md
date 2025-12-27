@@ -1,10 +1,14 @@
-# 🚨 Emergency Info
+# 🔗 Rescue Link ID
+
+**rescuelinkid.com**
 
 A personal emergency information platform that allows users to create secure, shareable emergency contact pages accessible via QR code.
 
 ## Concept
 
-In an emergency, first responders or bystanders can scan a QR code (on a wallet card, phone case, medical bracelet, etc.) to instantly access critical medical and contact information - **no app download required**. This website is going to be open to the public so I need a main landing page that has user login section as well as a informational button. That tells you all about the features and what it does. This website is essentially going to be. For people. To sign in. And list their primary contact information, emergency contact information. Medicines that they are on. And anything medical. As well as an address. This. Individual user. Layout. Will have the ability to print a QR code. To a very unique URL that would not be guessed by another user or anybody trying to infiltrate the system. Each QR code on scan. Will bring you to the emergency contact for that person without having to log into anything. So this will be valid for elderly people that may get lost. Or a medical situation. The thought is to have the QR code printed out. Where they would be able to laminate it and keep it on their person. Do you have any other ideas that we could implement into this? I would like a test HTML while we're building this. Until we're finalized and then I can set up a container on Proxmox and get a URL. To set this all up up. Also take a look at the MD file that was brought over as an idea from another project. I think the other project also set a few things up in the folder emergency. At the top of the website we can also have a version number. Also I'm thinking. When a user is logged in. They have a area where they can contact me. I'm not sure how we can set that up yet, probably with e-mail JS. Is an idea. We can also do a 30 day trial. And I will also have to have an admin side. To manage users. And 30 day trials. We're also going to need. On the. Information page. About security of information. And we need to ensure that all this information is encrypted as much as we can. The trial is free, no credit card or personal information. And all features will be available. If they want to purchase, we can have a button. That will bring them to another page. Where we can set up information so they can EMT me the money. We can figure that part out when we get to it. I'm thinking probably $40.00 for the year.
+In an emergency, first responders or bystanders can scan a QR code (on a wallet card, phone case, medical bracelet, etc.) to instantly access critical medical and contact information - **no app download required**.
+
+Users can sign in and list their primary contact information, emergency contacts, medications, medical info, and address. Each profile generates a QR code linking to a unique, unguessable URL. Perfect for elderly individuals who may get lost, or anyone with medical conditions.
 
 ## Features
 
@@ -14,14 +18,16 @@ In an emergency, first responders or bystanders can scan a QR code (on a wallet 
 - 👨‍👩‍👧 **Family Profiles** - Manage multiple people (kids, parents)
 - 🔐 **Secure URLs** - Long random URLs that can't be guessed
 - 🖨️ **Printable Cards** - Generate wallet cards with QR codes
+- 🌓 **Light/Dark Mode** - Theme toggle for user preference
 
 ## Tech Stack
 
-- **Framework**: Next.js 14 (App Router)
-- **Styling**: Tailwind CSS
-- **Auth**: Firebase Authentication
-- **Database**: Firebase Firestore
-- **Hosting**: Vercel / Proxmox
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS 4
+- **Auth**: Firebase Authentication (planned)
+- **Database**: Firebase Firestore (planned)
+- **Hosting**: Proxmox / Custom Domain
 
 ## Getting Started
 
@@ -35,6 +41,8 @@ npm run dev
 # Open http://localhost:3000
 ```
 
+**Test Login:** `admin` / `1234`
+
 ## Project Structure
 
 ```
@@ -43,13 +51,16 @@ src/
 │   ├── page.tsx          # Landing page
 │   ├── login/            # Login page
 │   ├── register/         # Registration page
-│   ├── dashboard/        # User's profiles (TODO)
-│   └── e/[slug]/         # Public emergency page (TODO)
-├── components/           # Reusable components (TODO)
-└── lib/                  # Firebase config, utils (TODO)
+│   ├── dashboard/        # User's profiles
+│   ├── info/             # Features & security info
+│   ├── admin/            # Admin panel
+│   ├── payment/          # Payment instructions
+│   └── e/[slug]/         # Public emergency page
+├── components/           # ThemeProvider, Header, etc.
+└── lib/                  # Mock data, utilities
 
 docs/
-├── PROJECT-SPEC.md       # Full project specification
+├── README-project.md     # Full project specification
 └── example-emergency-page.html  # Reference implementation
 ```
 
@@ -58,15 +69,23 @@ docs/
 - [x] Project setup with Next.js + Tailwind
 - [x] Landing page
 - [x] Login/Register UI
+- [x] Light/Dark theme toggle
+- [x] Dashboard page
+- [x] Info page with security details
+- [x] Admin panel
+- [x] Payment page
+- [x] Emergency page (/e/[slug])
 - [ ] Firebase Auth integration
-- [ ] Profile creation form
-- [ ] Emergency page generation
+- [ ] Profile creation/edit form
 - [ ] QR code generation
 - [ ] Wallet card PDF export
+- [ ] EmailJS contact form
 
-## Origin
+## Business Model
 
-Originally built as a feature for [tyrigley.com](https://tyrigley.com) - a simple emergency info page for a kid. Expanded into a full platform idea.
+- 30-day free trial (no credit card required)
+- $40/year subscription
+- Payment via e-transfer
 
 ## License
 

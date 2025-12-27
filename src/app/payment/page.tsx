@@ -23,7 +23,7 @@ export default function Payment() {
             <div className="text-5xl mb-4">💳</div>
             <h1 className="text-4xl font-bold mb-4">Upgrade Your Account</h1>
             <p className="text-text-secondary text-lg">
-              Continue protecting your family with Emergency Info
+              Continue protecting your family with Rescue Link ID
             </p>
           </div>
 
@@ -71,7 +71,7 @@ export default function Payment() {
                     Send $40 CAD via Interac e-Transfer to:
                   </p>
                   <div className="mt-2 bg-input-bg border border-input-border rounded-lg p-3 font-mono text-sm">
-                    payments@emergencyinfo.ca
+                    payments@rescuelinkid.com
                   </div>
                 </div>
               </div>
@@ -111,11 +111,11 @@ export default function Payment() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <a
-                href="mailto:support@emergencyinfo.ca"
+                href="mailto:support@rescuelinkid.com"
                 className="flex items-center justify-center gap-2 bg-card-bg hover:bg-input-bg border border-card-border font-medium py-3 px-6 rounded-lg transition-colors"
               >
                 <span>📧</span>
-                <span>support@emergencyinfo.ca</span>
+                <span>support@rescuelinkid.com</span>
               </a>
             </div>
           </div>

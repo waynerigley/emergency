@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Emergency Info Platform - A Next.js application for creating shareable emergency information pages with QR codes. First responders or bystanders scan a QR code (wallet card, phone case, medical bracelet) to instantly access critical medical and contact information - no app or login required to view.
+Rescue Link ID (rescuelinkid.com) - A Next.js application for creating shareable emergency information pages with QR codes. First responders or bystanders scan a QR code (wallet card, phone case, medical bracelet) to instantly access critical medical and contact information - no app or login required to view.
 
 ### Target Users
 - Elderly individuals who may get lost

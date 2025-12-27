@@ -8,7 +8,7 @@ export default function Info() {
         <div className="text-center max-w-3xl mx-auto">
           <h1 className="text-4xl font-bold mb-6">Everything You Need to Know</h1>
           <p className="text-xl text-text-secondary">
-            Emergency Info is a simple, secure platform for sharing critical medical information when it matters most.
+            Rescue Link ID is a simple, secure platform for sharing critical medical information when it matters most.
           </p>
         </div>
       </div>
@@ -193,7 +193,7 @@ export default function Info() {
       <div className="container mx-auto px-4 py-16">
         <div className="text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
-          <p className="text-text-secondary mb-8">Join thousands of families who trust Emergency Info to keep their loved ones safe.</p>
+          <p className="text-text-secondary mb-8">Join thousands of families who trust Rescue Link ID to keep their loved ones safe.</p>
           <Link
             href="/register"
             className="inline-block bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors"
@@ -206,7 +206,7 @@ export default function Info() {
       {/* Footer */}
       <footer className="border-t border-card-border mt-20">
         <div className="container mx-auto px-4 py-8 text-center text-text-tertiary text-sm">
-          <p>Emergency Info Platform &copy; {new Date().getFullYear()}</p>
+          <p>Rescue Link ID &copy; {new Date().getFullYear()} | rescuelinkid.com</p>
         </div>
       </footer>
     </div>

@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Emergency Info - Secure Emergency Contact Platform",
+  title: "Rescue Link ID - Secure Emergency Contact Platform",
   description: "Create secure, shareable emergency information pages accessible via QR code. No app required.",
 };
 

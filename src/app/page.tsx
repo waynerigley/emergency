@@ -6,9 +6,9 @@ export default function Home() {
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-20">
         <div className="text-center max-w-3xl mx-auto">
-          <div className="text-6xl mb-6">🚨</div>
+          <div className="text-6xl mb-6">🔗</div>
           <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
-            Emergency Info
+            Rescue Link ID
           </h1>
           <p className="text-xl text-text-secondary mb-8">
             Create a personal emergency information page that first responders can access instantly by scanning a QR code. No app required.
@@ -32,7 +32,7 @@ export default function Home() {
 
       {/* Features Section */}
       <div className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-center mb-12">Why Emergency Info?</h2>
+        <h2 className="text-3xl font-bold text-center mb-12">Why Rescue Link ID?</h2>
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           <div className="bg-card-bg p-6 rounded-xl border border-card-border">
             <div className="text-3xl mb-4">📱</div>
@@ -127,7 +127,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t border-card-border mt-20">
         <div className="container mx-auto px-4 py-8 text-center text-text-tertiary text-sm">
-          <p>Emergency Info Platform &copy; {new Date().getFullYear()}</p>
+          <p>Rescue Link ID &copy; {new Date().getFullYear()} | rescuelinkid.com</p>
         </div>
       </footer>
     </div>
