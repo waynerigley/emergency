@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Info - Ty Rigley</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .emergency-banner {
+            background: #dc2626;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .photo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid rgba(255,255,255,0.3);
+            object-fit: cover;
+            margin-bottom: 12px;
+        }
+
+        .name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .dob {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .blood-type {
+            background: #ffffff;
+            border: 4px solid #dc2626;
+            color: #dc2626;
+            padding: 16px 24px;
+            margin: -20px auto 0;
+            border-radius: 12px;
+            text-align: center;
+            width: fit-content;
+            position: relative;
+            z-index: 10;
+        }
+
+        .blood-type-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .blood-type-value {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .section {
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .allergies {
+            background: #dcfce7;
+            border: 2px solid #16a34a;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .allergies-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #16a34a;
+        }
+
+        .contact-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .contact-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .contact-card.dad {
+            border-left: 4px solid #3b82f6;
+        }
+
+        .contact-card.mom {
+            border-left: 4px solid #ec4899;
+        }
+
+        .contact-card.doctor {
+            border-left: 4px solid #ef4444;
+        }
+
+        .contact-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .contact-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .call-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: #16a34a;
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+
+        .call-btn:hover {
+            background: #15803d;
+        }
+
+        .call-btn.secondary {
+            background: #3b82f6;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            padding: 10px 16px;
+        }
+
+        .call-btn.secondary:hover {
+            background: #2563eb;
+        }
+
+        .address {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 8px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 16px;
+            color: #94a3b8;
+            font-size: 0.75rem;
+        }
+
+        .footer a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+
+        /* Print styles */
+        @media print {
+            .emergency-banner {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="emergency-banner">
+            ⚠️ Emergency Information Only
+        </div>
+
+        <div class="card">
+            <div class="header">
+                <img src="TyProfile.png" alt="Ty Rigley" class="photo">
+                <div class="name">Ty Rigley</div>
+                <div class="dob">Born: August 27, 2011 (Age 13)</div>
+            </div>
+
+            <div class="blood-type">
+                <div class="blood-type-label">Blood Type</div>
+                <div class="blood-type-value">O+</div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Allergies</div>
+                <div class="allergies">
+                    <div class="allergies-value">✓ No Known Allergies</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Emergency Contacts</div>
+
+                <div class="contact-card dad">
+                    <div class="contact-label">Father</div>
+                    <div class="contact-name">Wayne Rigley</div>
+                    <a href="tel:+12265061254" class="call-btn">
+                        📞 Call: (226) 506-1254
+                    </a>
+                </div>
+
+                <div class="contact-card mom">
+                    <div class="contact-label">Mother</div>
+                    <div class="contact-name">Maggie Karol</div>
+                    <a href="tel:+15199804197" class="call-btn">
+                        📞 Call: (519) 980-4197
+                    </a>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Family Doctor</div>
+
+                <div class="contact-card doctor">
+                    <div class="contact-label">Physician</div>
+                    <div class="contact-name">Dr. Jarrar</div>
+                    <a href="tel:+15199460177" class="call-btn secondary">
+                        📞 Call: (519) 946-0177
+                    </a>
+                    <div class="address">📍 13278 Tecumseh Rd E, Windsor, ON</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            This page is for emergency use only.<br>
+            <a href="index.html">Return to main profile</a>
+        </div>
+    </div>
+</body>
+</html>
