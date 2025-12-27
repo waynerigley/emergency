@@ -11,7 +11,7 @@ export default function Home() {
             <span className="text-red-500 text-sm font-medium">Life-saving information at their fingertips</span>
           </div>
           <img src="/logo2.png" alt="Rescue Link ID" className="h-32 md:h-40 mx-auto mb-6" />
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight whitespace-nowrap">
             Emergency Info That <span className="bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">Saves Lives</span>
           </h1>
           <p className="text-xl text-text-secondary mb-10 max-w-2xl mx-auto leading-relaxed">
