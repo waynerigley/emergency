@@ -130,6 +130,9 @@ export function getAllUsers(): User[] {
   return mockUsers;
 }
 
+// Admin emails - these users get admin access
+const ADMIN_EMAILS = ['admin@rescuelinkid.com', 'waynerigley@gmail.com'];
+
 // Helper function to find user by email/password
 export function authenticateUser(email: string, password: string): User | null {
   // Check admin first
@@ -145,6 +148,10 @@ export function authenticateUser(email: string, password: string): User | null {
       const user = users.find(u => u.email === email && u.password === password);
       if (user) {
         const { password: _, ...userWithoutPassword } = user;
+        // Grant admin if email is in admin list
+        if (ADMIN_EMAILS.includes(email)) {
+          userWithoutPassword.isAdmin = true;
+        }
         return userWithoutPassword;
       }
     }
@@ -175,7 +182,7 @@ export function registerUser(name: string, email: string, password: string): Use
     createdAt: new Date().toISOString().split('T')[0],
     trialEndsAt: trialEnd.toISOString().split('T')[0],
     isPaid: false,
-    isAdmin: false,
+    isAdmin: ADMIN_EMAILS.includes(email),
     profiles: []
   };
 
