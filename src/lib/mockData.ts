@@ -257,6 +257,19 @@ function generateSlug(): string {
   return slug;
 }
 
+// Save profile to server API
+async function saveProfileToServer(profile: Profile & { userId: string }): Promise<void> {
+  try {
+    await fetch('/api/profiles', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(profile),
+    });
+  } catch (error) {
+    console.error('Failed to save profile to server:', error);
+  }
+}
+
 // Add a new profile for a user
 export function addProfile(userId: string, profileData: Omit<Profile, 'id' | 'slug' | 'lastUpdated'>): Profile | null {
   if (typeof window === 'undefined') return null;
@@ -288,6 +301,9 @@ export function addProfile(userId: string, profileData: Omit<Profile, 'id' | 'sl
       localStorage.setItem('registeredUsers', JSON.stringify(users));
     }
   }
+
+  // Save to server for QR code access
+  saveProfileToServer({ ...newProfile, userId });
 
   return newProfile;
 }
@@ -333,6 +349,11 @@ export function updateProfile(userId: string, profileId: string, profileData: Pa
         localStorage.setItem('registeredUsers', JSON.stringify(users));
       }
     }
+  }
+
+  // Save to server for QR code access
+  if (updatedProfile) {
+    saveProfileToServer({ ...updatedProfile, userId });
   }
 
   return updatedProfile;

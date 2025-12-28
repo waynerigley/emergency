@@ -10,6 +10,19 @@ function getMapsUrl(address: string): string {
   return `https://maps.google.com/maps?daddr=${encoded}`;
 }
 
+// Fetch profile from server API
+async function fetchProfileFromServer(slug: string): Promise<Profile | null> {
+  try {
+    const response = await fetch(`/api/profiles?slug=${encodeURIComponent(slug)}`);
+    if (response.ok) {
+      return await response.json();
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export default function EmergencyPage() {
   const params = useParams();
   const slug = params.slug as string;
@@ -18,15 +31,28 @@ export default function EmergencyPage() {
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    if (slug) {
-      const found = getProfileBySlug(slug);
-      if (found) {
-        setProfile(found);
+    async function loadProfile() {
+      if (!slug) return;
+
+      // First try localStorage (for the profile owner)
+      const localProfile = getProfileBySlug(slug);
+      if (localProfile) {
+        setProfile(localProfile);
+        setLoading(false);
+        return;
+      }
+
+      // Then try server API (for QR code scanners)
+      const serverProfile = await fetchProfileFromServer(slug);
+      if (serverProfile) {
+        setProfile(serverProfile);
       } else {
         setNotFound(true);
       }
       setLoading(false);
     }
+
+    loadProfile();
   }, [slug]);
 
   if (loading) {
