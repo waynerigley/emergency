@@ -104,9 +104,19 @@ export default function EmergencyPage() {
         <div className="relative bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 text-white pt-8 pb-12 px-6">
           <div className="absolute inset-0 opacity-5 bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-[size:30px_30px]"></div>
           <div className="relative text-center">
-            <div className="w-28 h-28 bg-gradient-to-br from-white/20 to-white/5 rounded-full mx-auto mb-4 flex items-center justify-center text-5xl font-light border-4 border-white/20 shadow-xl backdrop-blur">
-              {profile.name.charAt(0)}
-            </div>
+            {profile.photo ? (
+              <div className="w-28 h-28 rounded-full mx-auto mb-4 border-4 border-white/20 shadow-xl overflow-hidden">
+                <img
+                  src={profile.photo}
+                  alt={profile.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ) : (
+              <div className="w-28 h-28 bg-gradient-to-br from-white/20 to-white/5 rounded-full mx-auto mb-4 flex items-center justify-center text-5xl font-light border-4 border-white/20 shadow-xl backdrop-blur">
+                {profile.name.charAt(0)}
+              </div>
+            )}
             <h1 className="text-3xl font-bold tracking-tight">{profile.name}</h1>
             <p className="text-slate-400 mt-1 text-lg">{age} years old</p>
           </div>

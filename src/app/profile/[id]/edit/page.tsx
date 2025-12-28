@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { User, Profile, updateProfile, EmergencyContact, Medication } from "@/lib/mockData";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
+import PhotoUpload from "@/components/PhotoUpload";
 
 export default function EditProfile() {
   const router = useRouter();
@@ -21,6 +22,7 @@ export default function EditProfile() {
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [bloodType, setBloodType] = useState("");
   const [address, setAddress] = useState("");
+  const [photo, setPhoto] = useState("");
   const [allergies, setAllergies] = useState("");
   const [medicalConditions, setMedicalConditions] = useState("");
   const [specialInstructions, setSpecialInstructions] = useState("");
@@ -56,6 +58,7 @@ export default function EditProfile() {
         setDateOfBirth(foundProfile.dateOfBirth);
         setBloodType(foundProfile.bloodType);
         setAddress(foundProfile.address || "");
+        setPhoto(foundProfile.photo || "");
         setAllergies(foundProfile.allergies.join(", "));
         setMedicalConditions(foundProfile.medicalConditions.join(", "));
         setSpecialInstructions(foundProfile.specialInstructions || "");
@@ -122,6 +125,7 @@ export default function EditProfile() {
       dateOfBirth,
       bloodType,
       address,
+      photo: photo || undefined,
       allergies: allergies.split(',').map(a => a.trim()).filter(a => a),
       medicalConditions: medicalConditions.split(',').map(c => c.trim()).filter(c => c),
       medications,
@@ -205,6 +209,13 @@ export default function EditProfile() {
                   required
                 />
               </div>
+              {profile && (
+                <PhotoUpload
+                  profileId={profile.id}
+                  currentPhoto={photo}
+                  onPhotoChange={setPhoto}
+                />
+              )}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-text-secondary mb-2">Date of Birth *</label>
