@@ -88,6 +88,28 @@ export default function Info() {
               Emergency pages work in any browser. No app download needed - just scan and view. Works on any phone or device.
             </p>
           </div>
+          <div className="bg-card-bg p-6 rounded-2xl border border-card-border hover:border-red-500/30 transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-red-500/5">
+            <div className="w-12 h-12 bg-rose-500/10 rounded-xl flex items-center justify-center mb-4">
+              <svg className="w-6 h-6 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Profile Photos</h3>
+            <p className="text-text-secondary">
+              Upload a photo to help first responders identify the person quickly. Especially helpful for children and elderly family members.
+            </p>
+          </div>
+          <div className="bg-card-bg p-6 rounded-2xl border border-card-border hover:border-red-500/30 transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-red-500/5">
+            <div className="w-12 h-12 bg-teal-500/10 rounded-xl flex items-center justify-center mb-4">
+              <svg className="w-6 h-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Communication Needs</h3>
+            <p className="text-text-secondary">
+              Indicate if the person is deaf, non-verbal, blind, or uses sign language. Helps first responders communicate effectively in emergencies.
+            </p>
+          </div>
         </div>
       </div>
 
