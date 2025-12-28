@@ -148,44 +148,6 @@ export const mockUsers: User[] = [
         lastUpdated: '2024-12-20'
       }
     ]
-  },
-  {
-    id: '2',
-    email: 'john@example.com',
-    name: 'John Doe',
-    createdAt: '2024-12-01',
-    trialEndsAt: '2025-01-01',
-    isPaid: false,
-    isAdmin: false,
-    profiles: [
-      {
-        id: 'p2',
-        slug: 'xyz789abc123def456ghi',
-        name: 'Jane Doe',
-        dateOfBirth: '1985-03-15',
-        bloodType: 'A-',
-        allergies: [],
-        medicalConditions: ['Diabetes Type 2'],
-        medications: [
-          { id: 'm2', name: 'Metformin', dosage: '500mg', frequency: 'Twice daily' }
-        ],
-        emergencyContacts: [
-          { id: 'c3', name: 'John Doe', relationship: 'Husband', phone: '555-456-7890', isPrimary: true }
-        ],
-        address: '456 Oak Avenue, Somewhere, USA 67890',
-        lastUpdated: '2024-12-15'
-      }
-    ]
-  },
-  {
-    id: '3',
-    email: 'mary@example.com',
-    name: 'Mary Smith',
-    createdAt: '2024-12-20',
-    trialEndsAt: '2025-01-20',
-    isPaid: false,
-    isAdmin: false,
-    profiles: []
   }
 ];
 
@@ -199,73 +161,6 @@ export function getAllUsers(): User[] {
     return [...mockUsers, ...registered];
   }
   return mockUsers;
-}
-
-// Admin emails - these users get admin access
-const ADMIN_EMAILS = ['admin@rescuelinkid.com', 'waynerigley@gmail.com'];
-
-// Helper function to find user by email/password
-export function authenticateUser(email: string, password: string): User | null {
-  // Check admin first
-  if (email === 'admin@rescuelinkid.com' && password === 'admin123') {
-    return mockUsers[0];
-  }
-
-  // Check registered users in localStorage
-  if (typeof window !== 'undefined') {
-    const storedUsers = localStorage.getItem('registeredUsers');
-    if (storedUsers) {
-      const users = JSON.parse(storedUsers) as (User & { password: string })[];
-      const user = users.find(u => u.email === email && u.password === password);
-      if (user) {
-        const { password: _, ...userWithoutPassword } = user;
-        // Grant admin if email is in admin list
-        if (ADMIN_EMAILS.includes(email)) {
-          userWithoutPassword.isAdmin = true;
-        }
-        return userWithoutPassword;
-      }
-    }
-  }
-
-  return null;
-}
-
-// Helper function to register a new user
-export function registerUser(name: string, email: string, password: string): User | null {
-  if (typeof window === 'undefined') return null;
-
-  // Check if email already exists
-  const allUsers = getAllUsers();
-  if (allUsers.some(u => u.email === email)) {
-    return null;
-  }
-
-  // Create new user
-  const trialEnd = new Date();
-  trialEnd.setDate(trialEnd.getDate() + 30);
-
-  const newUser: User & { password: string } = {
-    id: `user_${Date.now()}`,
-    email,
-    name,
-    password,
-    createdAt: new Date().toISOString().split('T')[0],
-    trialEndsAt: trialEnd.toISOString().split('T')[0],
-    isPaid: false,
-    isAdmin: ADMIN_EMAILS.includes(email),
-    profiles: []
-  };
-
-  // Store in localStorage
-  const storedUsers = localStorage.getItem('registeredUsers');
-  const users = storedUsers ? JSON.parse(storedUsers) : [];
-  users.push(newUser);
-  localStorage.setItem('registeredUsers', JSON.stringify(users));
-
-  // Return user without password
-  const { password: _, ...userWithoutPassword } = newUser;
-  return userWithoutPassword;
 }
 
 // Helper function to find profile by slug

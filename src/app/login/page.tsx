@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { authenticateUser } from "@/lib/mockData";
 
 export default function Login() {
   const router = useRouter();
@@ -17,23 +16,31 @@ export default function Login() {
     setError("");
     setLoading(true);
 
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const user = authenticateUser(email, password);
+      const data = await response.json();
 
-    if (user) {
-      // Store user in localStorage for now
-      localStorage.setItem('currentUser', JSON.stringify(user));
+      if (response.ok && data.user) {
+        // Store user in localStorage
+        localStorage.setItem('currentUser', JSON.stringify(data.user));
 
-      // Redirect based on user type
-      if (user.isAdmin) {
-        router.push('/admin');
+        // Redirect based on user type
+        if (data.user.isAdmin) {
+          router.push('/admin');
+        } else {
+          router.push('/dashboard');
+        }
       } else {
-        router.push('/dashboard');
+        setError(data.error || "Invalid email or password");
+        setLoading(false);
       }
-    } else {
-      setError("Invalid email or password");
+    } catch {
+      setError("Login failed. Please try again.");
       setLoading(false);
     }
   };

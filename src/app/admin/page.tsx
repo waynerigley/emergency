@@ -3,13 +3,28 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { User, getAllUsers, getDaysRemaining, isTrialActive } from "@/lib/mockData";
+import { User, getDaysRemaining, isTrialActive } from "@/lib/mockData";
+
+interface AdminUser {
+  id: string;
+  email: string;
+  name: string;
+  createdAt: string;
+  trialEndsAt: string;
+  isPaid: boolean;
+  isAdmin: boolean;
+  profileCount: number;
+}
 
 export default function Admin() {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
+  const [showUserModal, setShowUserModal] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('currentUser');
@@ -17,7 +32,7 @@ export default function Admin() {
       const user = JSON.parse(storedUser);
       if (user.isAdmin) {
         setCurrentUser(user);
-        setUsers(getAllUsers());
+        loadUsers();
       } else {
         router.push('/dashboard');
       }
@@ -27,9 +42,104 @@ export default function Admin() {
     setLoading(false);
   }, [router]);
 
+  const loadUsers = async () => {
+    try {
+      const response = await fetch('/api/admin/users');
+      const data = await response.json();
+      if (data.users) {
+        setUsers(data.users);
+      }
+    } catch (error) {
+      console.error('Failed to load users:', error);
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('currentUser');
     router.push('/');
+  };
+
+  const handleViewUser = (user: AdminUser) => {
+    setSelectedUser(user);
+    setShowUserModal(true);
+  };
+
+  const handleGiveFreeAccount = async (userId: string) => {
+    setActionLoading(userId);
+    try {
+      const response = await fetch('/api/admin/users', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          isPaid: true,
+          trialEndsAt: '2099-12-31',
+        }),
+      });
+
+      if (response.ok) {
+        setMessage({ type: 'success', text: 'User granted free lifetime account!' });
+        loadUsers();
+      } else {
+        const data = await response.json();
+        setMessage({ type: 'error', text: data.error || 'Failed to update user' });
+      }
+    } catch {
+      setMessage({ type: 'error', text: 'Failed to update user' });
+    }
+    setActionLoading(null);
+    setTimeout(() => setMessage(null), 3000);
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    if (!confirm('Are you sure you want to delete this user? This cannot be undone.')) {
+      return;
+    }
+
+    setActionLoading(userId);
+    try {
+      const response = await fetch('/api/admin/users', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+
+      if (response.ok) {
+        setMessage({ type: 'success', text: 'User deleted successfully' });
+        setShowUserModal(false);
+        loadUsers();
+      } else {
+        const data = await response.json();
+        setMessage({ type: 'error', text: data.error || 'Failed to delete user' });
+      }
+    } catch {
+      setMessage({ type: 'error', text: 'Failed to delete user' });
+    }
+    setActionLoading(null);
+    setTimeout(() => setMessage(null), 3000);
+  };
+
+  const handleExportData = async () => {
+    try {
+      const response = await fetch('/api/admin/export');
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `rescuelink-backup-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      setMessage({ type: 'success', text: 'Data exported successfully!' });
+    } catch {
+      setMessage({ type: 'error', text: 'Failed to export data' });
+    }
+    setTimeout(() => setMessage(null), 3000);
+  };
+
+  const handleSendEmail = () => {
+    window.location.href = 'mailto:?subject=Rescue Link ID&body=Hello from Rescue Link ID';
   };
 
   if (loading) {
@@ -52,11 +162,20 @@ export default function Admin() {
   const totalUsers = users.length;
   const activeTrials = users.filter(u => !u.isPaid && isTrialActive(u.trialEndsAt)).length;
   const paidUsers = users.filter(u => u.isPaid).length;
-  const totalProfiles = users.reduce((sum, u) => sum + u.profiles.length, 0);
+  const totalProfiles = users.reduce((sum, u) => sum + (u.profileCount || 0), 0);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[var(--gradient-from)] to-[var(--gradient-to)]">
       <div className="container mx-auto px-4 py-8">
+        {/* Message Toast */}
+        {message && (
+          <div className={`fixed top-4 right-4 z-50 p-4 rounded-xl shadow-lg ${
+            message.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+          } text-white font-medium`}>
+            {message.text}
+          </div>
+        )}
+
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
@@ -204,7 +323,7 @@ export default function Admin() {
                         </div>
                       </td>
                       <td className="p-4">
-                        <span className="text-text-secondary">{user.profiles.length}</span>
+                        <span className="text-text-secondary">{user.profileCount || 0}</span>
                       </td>
                       <td className="p-4">
                         {user.isPaid ? (
@@ -220,22 +339,33 @@ export default function Admin() {
                       </td>
                       <td className="p-4">
                         <div className="flex gap-2">
-                          <button className="p-2 hover:bg-input-bg rounded-lg transition-colors" title="View">
+                          <button
+                            onClick={() => handleViewUser(user)}
+                            className="p-2 hover:bg-input-bg rounded-lg transition-colors"
+                            title="View Details"
+                          >
                             <svg className="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
                           </button>
-                          <button className="p-2 hover:bg-input-bg rounded-lg transition-colors" title="Edit">
-                            <svg className="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                          </button>
-                          {!user.isPaid && (
-                            <button className="p-2 hover:bg-green-500/10 rounded-lg transition-colors text-green-500" title="Mark Paid">
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              </svg>
+                          {!user.isPaid && !user.isAdmin && (
+                            <button
+                              onClick={() => handleGiveFreeAccount(user.id)}
+                              disabled={actionLoading === user.id}
+                              className="p-2 hover:bg-green-500/10 rounded-lg transition-colors text-green-500 disabled:opacity-50"
+                              title="Give Free Account"
+                            >
+                              {actionLoading === user.id ? (
+                                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                </svg>
+                              ) : (
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                              )}
                             </button>
                           )}
                         </div>
@@ -252,36 +382,116 @@ export default function Admin() {
         <div>
           <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
           <div className="grid sm:grid-cols-3 gap-4">
-            <button className="bg-card-bg hover:bg-input-bg border border-card-border p-5 rounded-2xl text-left transition-all hover:-translate-y-1 hover:border-red-500/30">
+            <button
+              onClick={handleSendEmail}
+              className="bg-card-bg hover:bg-input-bg border border-card-border p-5 rounded-2xl text-left transition-all hover:-translate-y-1 hover:border-red-500/30"
+            >
               <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mb-4">
                 <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
               </div>
               <h3 className="font-semibold mb-1">Send Email</h3>
-              <p className="text-text-secondary text-sm">Contact users or send announcements</p>
+              <p className="text-text-secondary text-sm">Open email client to contact users</p>
             </button>
-            <button className="bg-card-bg hover:bg-input-bg border border-card-border p-5 rounded-2xl text-left transition-all hover:-translate-y-1 hover:border-red-500/30">
+            <button
+              onClick={handleExportData}
+              className="bg-card-bg hover:bg-input-bg border border-card-border p-5 rounded-2xl text-left transition-all hover:-translate-y-1 hover:border-red-500/30"
+            >
               <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mb-4">
                 <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
               <h3 className="font-semibold mb-1">Export Data</h3>
-              <p className="text-text-secondary text-sm">Download user and subscription data</p>
+              <p className="text-text-secondary text-sm">Download all user and profile data</p>
             </button>
-            <button className="bg-card-bg hover:bg-input-bg border border-card-border p-5 rounded-2xl text-left transition-all hover:-translate-y-1 hover:border-red-500/30">
+            <Link
+              href="/info"
+              className="bg-card-bg hover:bg-input-bg border border-card-border p-5 rounded-2xl text-left transition-all hover:-translate-y-1 hover:border-red-500/30"
+            >
               <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-4">
                 <svg className="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="font-semibold mb-1">Settings</h3>
-              <p className="text-text-secondary text-sm">Configure platform settings</p>
-            </button>
+              <h3 className="font-semibold mb-1">View Info Page</h3>
+              <p className="text-text-secondary text-sm">See the public info page</p>
+            </Link>
           </div>
         </div>
+
+        {/* User Details Modal */}
+        {showUserModal && selectedUser && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-card-bg rounded-2xl border border-card-border max-w-md w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6 border-b border-card-border flex justify-between items-center">
+                <h3 className="text-xl font-bold">User Details</h3>
+                <button
+                  onClick={() => setShowUserModal(false)}
+                  className="p-2 hover:bg-input-bg rounded-lg transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-orange-500 rounded-2xl flex items-center justify-center text-white font-bold text-2xl">
+                    {selectedUser.name.charAt(0)}
+                  </div>
+                  <div>
+                    <div className="text-xl font-bold">{selectedUser.name}</div>
+                    <div className="text-text-secondary">{selectedUser.email}</div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-input-bg p-4 rounded-xl">
+                    <div className="text-text-secondary text-sm">Status</div>
+                    <div className="font-semibold">
+                      {selectedUser.isPaid ? 'Paid' : isTrialActive(selectedUser.trialEndsAt) ? 'Trial' : 'Expired'}
+                    </div>
+                  </div>
+                  <div className="bg-input-bg p-4 rounded-xl">
+                    <div className="text-text-secondary text-sm">Profiles</div>
+                    <div className="font-semibold">{selectedUser.profileCount || 0}</div>
+                  </div>
+                  <div className="bg-input-bg p-4 rounded-xl">
+                    <div className="text-text-secondary text-sm">Joined</div>
+                    <div className="font-semibold">{selectedUser.createdAt}</div>
+                  </div>
+                  <div className="bg-input-bg p-4 rounded-xl">
+                    <div className="text-text-secondary text-sm">Trial Ends</div>
+                    <div className="font-semibold">{selectedUser.trialEndsAt}</div>
+                  </div>
+                </div>
+
+                {!selectedUser.isAdmin && (
+                  <div className="flex gap-3 pt-4">
+                    {!selectedUser.isPaid && (
+                      <button
+                        onClick={() => handleGiveFreeAccount(selectedUser.id)}
+                        disabled={actionLoading === selectedUser.id}
+                        className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-green-600/50 text-white font-semibold py-3 px-4 rounded-xl transition-all"
+                      >
+                        {actionLoading === selectedUser.id ? 'Processing...' : 'Give Free Account'}
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleDeleteUser(selectedUser.id)}
+                      disabled={actionLoading === selectedUser.id}
+                      className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-red-600/50 text-white font-semibold py-3 px-4 rounded-xl transition-all"
+                    >
+                      {actionLoading === selectedUser.id ? 'Processing...' : 'Delete User'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

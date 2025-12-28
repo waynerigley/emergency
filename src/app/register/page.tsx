@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { registerUser } from "@/lib/mockData";
 
 export default function Register() {
   const router = useRouter();
@@ -30,17 +29,25 @@ export default function Register() {
 
     setLoading(true);
 
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password }),
+      });
 
-    const user = registerUser(name, email, password);
+      const data = await response.json();
 
-    if (user) {
-      // Auto-login the user
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      router.push("/dashboard");
-    } else {
-      setError("An account with this email already exists");
+      if (response.ok && data.user) {
+        // Auto-login the user
+        localStorage.setItem('currentUser', JSON.stringify(data.user));
+        router.push("/dashboard");
+      } else {
+        setError(data.error || "Registration failed");
+        setLoading(false);
+      }
+    } catch {
+      setError("Registration failed. Please try again.");
       setLoading(false);
     }
   };
