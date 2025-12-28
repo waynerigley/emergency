@@ -1,23 +1,62 @@
-import { getProfileBySlug, calculateAge } from "@/lib/mockData";
-import { notFound } from "next/navigation";
+"use client";
 
-interface PageProps {
-  params: Promise<{ slug: string }>;
-}
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { Profile, getProfileBySlug, calculateAge } from "@/lib/mockData";
 
-// Helper to generate maps URL (works with Google Maps on Android, Apple Maps on iOS)
+// Helper to generate maps URL
 function getMapsUrl(address: string): string {
   const encoded = encodeURIComponent(address);
-  // This URL scheme works on both iOS (opens Apple Maps) and Android (opens Google Maps)
   return `https://maps.google.com/maps?daddr=${encoded}`;
 }
 
-export default async function EmergencyPage({ params }: PageProps) {
-  const { slug } = await params;
-  const profile = getProfileBySlug(slug);
+export default function EmergencyPage() {
+  const params = useParams();
+  const slug = params.slug as string;
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
-  if (!profile) {
-    notFound();
+  useEffect(() => {
+    if (slug) {
+      const found = getProfileBySlug(slug);
+      if (found) {
+        setProfile(found);
+      } else {
+        setNotFound(true);
+      }
+      setLoading(false);
+    }
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="flex items-center gap-3">
+          <svg className="animate-spin w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span className="text-lg text-slate-600">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (notFound || !profile) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+        <div className="text-center">
+          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-slate-800 mb-2">Profile Not Found</h1>
+          <p className="text-slate-600">This emergency profile doesn't exist or has been removed.</p>
+        </div>
+      </div>
+    );
   }
 
   const age = calculateAge(profile.dateOfBirth);
@@ -39,7 +78,6 @@ export default async function EmergencyPage({ params }: PageProps) {
         <div className="relative bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 text-white pt-8 pb-12 px-6">
           <div className="absolute inset-0 opacity-5 bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-[size:30px_30px]"></div>
           <div className="relative text-center">
-            {/* Photo */}
             <div className="w-28 h-28 bg-gradient-to-br from-white/20 to-white/5 rounded-full mx-auto mb-4 flex items-center justify-center text-5xl font-light border-4 border-white/20 shadow-xl backdrop-blur">
               {profile.name.charAt(0)}
             </div>
@@ -56,9 +94,33 @@ export default async function EmergencyPage({ params }: PageProps) {
           </div>
         </div>
 
+        {/* Critical Alerts - EpiPen & Pacemaker */}
+        {(profile.hasEpiPen || profile.hasPacemaker) && (
+          <div className="px-4 pt-6">
+            <div className="flex gap-3 justify-center">
+              {profile.hasEpiPen && (
+                <div className="bg-orange-500 text-white font-bold px-4 py-2 rounded-xl flex items-center gap-2 shadow-lg">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M3 4a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm2 2V5h1v1H5zM3 13a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3zm2 2v-1h1v1H5zM13 3a1 1 0 00-1 1v3a1 1 0 001 1h3a1 1 0 001-1V4a1 1 0 00-1-1h-3zm1 2v1h1V5h-1z" clipRule="evenodd" />
+                  </svg>
+                  HAS EPIPEN
+                </div>
+              )}
+              {profile.hasPacemaker && (
+                <div className="bg-purple-600 text-white font-bold px-4 py-2 rounded-xl flex items-center gap-2 shadow-lg">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+                  </svg>
+                  HAS PACEMAKER
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Content */}
         <div className="px-4 pt-8 pb-8 space-y-4">
-          {/* Allergies - Most Critical */}
+          {/* Allergies */}
           {profile.allergies.length > 0 && (
             <div className="bg-red-50 border border-red-200 rounded-2xl p-5 shadow-sm">
               <div className="flex items-center gap-2 mb-4">
@@ -71,10 +133,7 @@ export default async function EmergencyPage({ params }: PageProps) {
               </div>
               <div className="flex flex-wrap gap-2">
                 {profile.allergies.map((allergy, idx) => (
-                  <span
-                    key={idx}
-                    className="bg-red-600 text-white font-bold px-4 py-2 rounded-xl text-base shadow-sm"
-                  >
+                  <span key={idx} className="bg-red-600 text-white font-bold px-4 py-2 rounded-xl text-base shadow-sm">
                     {allergy}
                   </span>
                 ))}
@@ -119,9 +178,7 @@ export default async function EmergencyPage({ params }: PageProps) {
                 {profile.medications.map((med) => (
                   <div key={med.id} className="bg-white rounded-xl px-4 py-3 shadow-sm border border-blue-100">
                     <div className="font-semibold text-slate-800">{med.name}</div>
-                    <div className="text-sm text-slate-500 mt-0.5">
-                      {med.dosage} • {med.frequency}
-                    </div>
+                    <div className="text-sm text-slate-500 mt-0.5">{med.dosage} • {med.frequency}</div>
                   </div>
                 ))}
               </div>
@@ -144,48 +201,47 @@ export default async function EmergencyPage({ params }: PageProps) {
           )}
 
           {/* Emergency Contacts */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                </svg>
-              </div>
-              <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Emergency Contacts</h2>
-            </div>
-            <div className="space-y-3">
-              {profile.emergencyContacts.map((contact) => (
-                <div
-                  key={contact.id}
-                  className="flex items-center justify-between bg-slate-50 rounded-xl p-4"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm ${
-                      contact.relationship.toLowerCase().includes('father') ? 'bg-blue-500' :
-                      contact.relationship.toLowerCase().includes('mother') ? 'bg-pink-500' :
-                      contact.relationship.toLowerCase().includes('spouse') || contact.relationship.toLowerCase().includes('wife') || contact.relationship.toLowerCase().includes('husband') ? 'bg-purple-500' :
-                      'bg-slate-500'
-                    }`}>
-                      {contact.name.charAt(0)}
-                    </div>
-                    <div>
-                      <div className="font-semibold text-slate-800">{contact.name}</div>
-                      <div className="text-sm text-slate-500">{contact.relationship}</div>
-                    </div>
-                  </div>
-                  <a
-                    href={`tel:${contact.phone}`}
-                    className="bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-bold px-5 py-3 rounded-xl transition-colors shadow-sm flex items-center gap-2"
-                  >
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                    </svg>
-                    Call
-                  </a>
+          {profile.emergencyContacts.length > 0 && (
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                  <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                  </svg>
                 </div>
-              ))}
+                <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wide">Emergency Contacts</h2>
+              </div>
+              <div className="space-y-3">
+                {profile.emergencyContacts.map((contact) => (
+                  <div key={contact.id} className="flex items-center justify-between bg-slate-50 rounded-xl p-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm ${
+                        contact.relationship.toLowerCase().includes('father') ? 'bg-blue-500' :
+                        contact.relationship.toLowerCase().includes('mother') ? 'bg-pink-500' :
+                        contact.relationship.toLowerCase().includes('spouse') || contact.relationship.toLowerCase().includes('wife') || contact.relationship.toLowerCase().includes('husband') ? 'bg-purple-500' :
+                        'bg-slate-500'
+                      }`}>
+                        {contact.name.charAt(0)}
+                      </div>
+                      <div>
+                        <div className="font-semibold text-slate-800">{contact.name}</div>
+                        <div className="text-sm text-slate-500">{contact.relationship}</div>
+                      </div>
+                    </div>
+                    <a
+                      href={`tel:${contact.phone}`}
+                      className="bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-bold px-5 py-3 rounded-xl transition-colors shadow-sm flex items-center gap-2"
+                    >
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                      </svg>
+                      Call
+                    </a>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Physician */}
           {profile.physicianName && (
@@ -223,7 +279,7 @@ export default async function EmergencyPage({ params }: PageProps) {
             </div>
           )}
 
-          {/* Address with Directions Button */}
+          {/* Address */}
           {profile.address && (
             <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
               <div className="flex items-center gap-2 mb-4">

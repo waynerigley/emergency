@@ -2,13 +2,18 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { User, getDaysRemaining, isTrialActive } from "@/lib/mockData";
+import { useEffect, useState, useRef } from "react";
+import { User, Profile, getDaysRemaining, isTrialActive } from "@/lib/mockData";
+import { QRCodeSVG } from "qrcode.react";
 
 export default function Dashboard() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
+  const [copySuccess, setCopySuccess] = useState(false);
+  const qrRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('currentUser');
@@ -23,6 +28,141 @@ export default function Dashboard() {
   const handleLogout = () => {
     localStorage.removeItem('currentUser');
     router.push('/');
+  };
+
+  const getProfileUrl = (profile: Profile) => {
+    return `https://rescuelinkid.com/e/${profile.slug}`;
+  };
+
+  const handleShareLink = (profile: Profile) => {
+    const url = getProfileUrl(profile);
+    navigator.clipboard.writeText(url).then(() => {
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    });
+  };
+
+  const handleShowQR = (profile: Profile) => {
+    setSelectedProfile(profile);
+    setShowQRModal(true);
+  };
+
+  const handleDownloadQR = () => {
+    if (!qrRef.current || !selectedProfile) return;
+
+    const svg = qrRef.current.querySelector('svg');
+    if (!svg) return;
+
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+
+    img.onload = () => {
+      canvas.width = 400;
+      canvas.height = 400;
+      if (ctx) {
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, 400, 400);
+
+        const link = document.createElement('a');
+        link.download = `rescue-link-qr-${selectedProfile.name.replace(/\s+/g, '-').toLowerCase()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      }
+    };
+
+    img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+  };
+
+  const handlePrintWalletCard = (profile: Profile) => {
+    const url = getProfileUrl(profile);
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Rescue Link ID - ${profile.name}</title>
+        <style>
+          @page { margin: 0.5in; }
+          body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+          .card {
+            border: 2px solid #dc2626;
+            border-radius: 16px;
+            padding: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+            page-break-inside: avoid;
+          }
+          .header {
+            background: linear-gradient(135deg, #dc2626, #ea580c);
+            color: white;
+            padding: 15px;
+            border-radius: 12px 12px 0 0;
+            margin: -20px -20px 20px -20px;
+            text-align: center;
+          }
+          .header h1 { margin: 0; font-size: 18px; }
+          .header p { margin: 5px 0 0; font-size: 12px; opacity: 0.9; }
+          .name { font-size: 24px; font-weight: bold; margin-bottom: 10px; text-align: center; }
+          .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+          .label { color: #666; font-size: 12px; }
+          .value { font-weight: 600; font-size: 14px; }
+          .qr-section { text-align: center; margin-top: 20px; padding-top: 20px; border-top: 2px dashed #ddd; }
+          .qr-code { margin: 10px auto; }
+          .scan-text { font-size: 11px; color: #666; margin-top: 10px; }
+          .url { font-size: 10px; color: #999; word-break: break-all; }
+          .emergency { color: #dc2626; font-weight: bold; }
+          @media print {
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="card">
+          <div class="header">
+            <h1>RESCUE LINK ID</h1>
+            <p>Emergency Medical Information</p>
+          </div>
+          <div class="name">${profile.name}</div>
+          <div class="info-row">
+            <span class="label">Blood Type</span>
+            <span class="value emergency">${profile.bloodType}</span>
+          </div>
+          ${profile.allergies.length > 0 ? `
+          <div class="info-row">
+            <span class="label">Allergies</span>
+            <span class="value emergency">${profile.allergies.join(', ')}</span>
+          </div>
+          ` : ''}
+          ${profile.medicalConditions.length > 0 ? `
+          <div class="info-row">
+            <span class="label">Conditions</span>
+            <span class="value">${profile.medicalConditions.join(', ')}</span>
+          </div>
+          ` : ''}
+          ${profile.emergencyContacts.length > 0 ? `
+          <div class="info-row">
+            <span class="label">Emergency Contact</span>
+            <span class="value">${profile.emergencyContacts[0].name}: ${profile.emergencyContacts[0].phone}</span>
+          </div>
+          ` : ''}
+          <div class="qr-section">
+            <div class="qr-code">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(url)}" alt="QR Code" width="150" height="150">
+            </div>
+            <div class="scan-text">Scan for complete emergency information</div>
+            <div class="url">${url}</div>
+          </div>
+        </div>
+        <script>window.onload = function() { window.print(); }</script>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
   if (loading) {
@@ -204,12 +344,46 @@ export default function Dashboard() {
                   </div>
 
                   {/* QR Code Preview */}
-                  <div className="bg-white p-4 rounded-xl mb-5 flex items-center justify-center">
-                    <div className="w-24 h-24 bg-slate-100 rounded-lg flex items-center justify-center">
-                      <svg className="w-12 h-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                  <div
+                    className="bg-white p-4 rounded-xl mb-5 flex items-center justify-center cursor-pointer hover:bg-slate-50 transition-colors"
+                    onClick={() => handleShowQR(profile)}
+                  >
+                    <QRCodeSVG
+                      value={getProfileUrl(profile)}
+                      size={96}
+                      level="M"
+                    />
+                  </div>
+
+                  {/* Quick Action Buttons */}
+                  <div className="flex gap-2 mb-4">
+                    <button
+                      onClick={() => handleShareLink(profile)}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 bg-green-500/10 hover:bg-green-500/20 text-green-500 text-xs font-medium py-2 px-3 rounded-lg transition-all"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                       </svg>
-                    </div>
+                      Share
+                    </button>
+                    <button
+                      onClick={() => handleShowQR(profile)}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 text-xs font-medium py-2 px-3 rounded-lg transition-all"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                      </svg>
+                      QR
+                    </button>
+                    <button
+                      onClick={() => handlePrintWalletCard(profile)}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 bg-purple-500/10 hover:bg-purple-500/20 text-purple-500 text-xs font-medium py-2 px-3 rounded-lg transition-all"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                      </svg>
+                      Print
+                    </button>
                   </div>
 
                   <div className="flex gap-3">
@@ -223,12 +397,15 @@ export default function Dashboard() {
                       </svg>
                       View
                     </Link>
-                    <button className="flex-1 inline-flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 px-4 rounded-xl transition-all text-sm">
+                    <Link
+                      href={`/profile/${profile.id}/edit`}
+                      className="flex-1 inline-flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 px-4 rounded-xl transition-all text-sm"
+                    >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                       </svg>
                       Edit
-                    </button>
+                    </Link>
                   </div>
 
                   <p className="text-text-tertiary text-xs mt-4 text-center">
@@ -244,7 +421,11 @@ export default function Dashboard() {
         <div>
           <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <button className="bg-card-bg hover:bg-input-bg border border-card-border p-5 rounded-2xl text-left transition-all hover:-translate-y-1 hover:border-red-500/30">
+            <button
+              onClick={() => user.profiles.length > 0 && handlePrintWalletCard(user.profiles[0])}
+              disabled={user.profiles.length === 0}
+              className="bg-card-bg hover:bg-input-bg border border-card-border p-5 rounded-2xl text-left transition-all hover:-translate-y-1 hover:border-red-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+            >
               <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-4">
                 <svg className="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -253,7 +434,11 @@ export default function Dashboard() {
               <h3 className="font-semibold mb-1">Print Wallet Card</h3>
               <p className="text-text-secondary text-sm">Download a printable PDF</p>
             </button>
-            <button className="bg-card-bg hover:bg-input-bg border border-card-border p-5 rounded-2xl text-left transition-all hover:-translate-y-1 hover:border-red-500/30">
+            <button
+              onClick={() => user.profiles.length > 0 && handleShowQR(user.profiles[0])}
+              disabled={user.profiles.length === 0}
+              className="bg-card-bg hover:bg-input-bg border border-card-border p-5 rounded-2xl text-left transition-all hover:-translate-y-1 hover:border-red-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+            >
               <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center mb-4">
                 <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
@@ -262,7 +447,11 @@ export default function Dashboard() {
               <h3 className="font-semibold mb-1">Download QR Code</h3>
               <p className="text-text-secondary text-sm">High-res for printing</p>
             </button>
-            <button className="bg-card-bg hover:bg-input-bg border border-card-border p-5 rounded-2xl text-left transition-all hover:-translate-y-1 hover:border-red-500/30">
+            <button
+              onClick={() => user.profiles.length > 0 && handleShareLink(user.profiles[0])}
+              disabled={user.profiles.length === 0}
+              className="bg-card-bg hover:bg-input-bg border border-card-border p-5 rounded-2xl text-left transition-all hover:-translate-y-1 hover:border-red-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+            >
               <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mb-4">
                 <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -283,6 +472,67 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Copy Success Toast */}
+      {copySuccess && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-2 animate-fade-in z-50">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+          Link copied to clipboard!
+        </div>
+      )}
+
+      {/* QR Code Modal */}
+      {showQRModal && selectedProfile && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => setShowQRModal(false)}>
+          <div className="bg-card-bg rounded-2xl border border-card-border p-6 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold">QR Code</h3>
+              <button onClick={() => setShowQRModal(false)} className="p-2 hover:bg-input-bg rounded-xl transition-colors">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <p className="text-text-secondary text-sm mb-4 text-center">{selectedProfile.name}</p>
+            <div className="bg-white p-6 rounded-xl flex items-center justify-center mb-4" ref={qrRef}>
+              <QRCodeSVG
+                value={getProfileUrl(selectedProfile)}
+                size={200}
+                level="H"
+                includeMargin={true}
+              />
+            </div>
+            <div className="space-y-3">
+              <button
+                onClick={handleDownloadQR}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Download QR Code
+              </button>
+              <button
+                onClick={() => {
+                  handleShareLink(selectedProfile);
+                  setShowQRModal(false);
+                }}
+                className="w-full bg-card-bg hover:bg-input-bg border border-card-border font-semibold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                </svg>
+                Copy Link
+              </button>
+            </div>
+            <p className="text-text-tertiary text-xs mt-4 text-center break-all">
+              {getProfileUrl(selectedProfile)}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

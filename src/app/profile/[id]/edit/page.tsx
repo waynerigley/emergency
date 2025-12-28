@@ -1,13 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { User, addProfile, EmergencyContact, Medication } from "@/lib/mockData";
+import { User, Profile, updateProfile, EmergencyContact, Medication } from "@/lib/mockData";
 
-export default function NewProfile() {
+export default function EditProfile() {
   const router = useRouter();
+  const params = useParams();
+  const profileId = params.id as string;
+
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -39,12 +43,35 @@ export default function NewProfile() {
   useEffect(() => {
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      const userData = JSON.parse(storedUser) as User;
+      setUser(userData);
+
+      // Find the profile
+      const foundProfile = userData.profiles.find(p => p.id === profileId);
+      if (foundProfile) {
+        setProfile(foundProfile);
+        // Populate form fields
+        setName(foundProfile.name);
+        setDateOfBirth(foundProfile.dateOfBirth);
+        setBloodType(foundProfile.bloodType);
+        setAddress(foundProfile.address || "");
+        setAllergies(foundProfile.allergies.join(", "));
+        setMedicalConditions(foundProfile.medicalConditions.join(", "));
+        setSpecialInstructions(foundProfile.specialInstructions || "");
+        setPhysicianName(foundProfile.physicianName || "");
+        setPhysicianPhone(foundProfile.physicianPhone || "");
+        setHasEpiPen(foundProfile.hasEpiPen || false);
+        setHasPacemaker(foundProfile.hasPacemaker || false);
+        setMedications(foundProfile.medications || []);
+        setContacts(foundProfile.emergencyContacts || []);
+      } else {
+        router.push('/dashboard');
+      }
     } else {
       router.push('/login');
     }
     setLoading(false);
-  }, [router]);
+  }, [router, profileId]);
 
   const addMedication = () => {
     if (newMedName && newMedDosage && newMedFrequency) {
@@ -85,11 +112,11 @@ export default function NewProfile() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || !profile) return;
 
     setSaving(true);
 
-    const profile = addProfile(user.id, {
+    const updatedProfile = updateProfile(user.id, profile.id, {
       name,
       dateOfBirth,
       bloodType,
@@ -105,14 +132,15 @@ export default function NewProfile() {
       hasPacemaker: hasPacemaker || undefined
     });
 
-    if (profile) {
+    if (updatedProfile) {
       // Update local user state
-      const updatedUser = { ...user, profiles: [...user.profiles, profile] };
+      const updatedProfiles = user.profiles.map(p => p.id === profile.id ? updatedProfile : p);
+      const updatedUser = { ...user, profiles: updatedProfiles };
       localStorage.setItem('currentUser', JSON.stringify(updatedUser));
       router.push('/dashboard');
     } else {
       setSaving(false);
-      alert('Error creating profile');
+      alert('Error updating profile');
     }
   };
 
@@ -125,6 +153,17 @@ export default function NewProfile() {
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
           <span className="text-lg">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[var(--gradient-from)] to-[var(--gradient-to)] flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Profile Not Found</h1>
+          <Link href="/dashboard" className="text-red-500 hover:underline">Return to Dashboard</Link>
         </div>
       </div>
     );
@@ -144,8 +183,8 @@ export default function NewProfile() {
             </svg>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold">Create Profile</h1>
-            <p className="text-text-secondary text-sm">Add emergency information for yourself or a family member</p>
+            <h1 className="text-2xl font-bold">Edit Profile</h1>
+            <p className="text-text-secondary text-sm">Update emergency information for {profile.name}</p>
           </div>
         </div>
 
@@ -416,7 +455,7 @@ export default function NewProfile() {
                   Saving...
                 </>
               ) : (
-                "Create Profile"
+                "Save Changes"
               )}
             </button>
           </div>

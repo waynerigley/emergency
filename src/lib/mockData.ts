@@ -30,6 +30,8 @@ export interface Profile {
   specialInstructions?: string;
   physicianName?: string;
   physicianPhone?: string;
+  hasEpiPen?: boolean;
+  hasPacemaker?: boolean;
   lastUpdated: string;
 }
 
