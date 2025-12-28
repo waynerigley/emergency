@@ -8,7 +8,7 @@ set -e
 # Configuration
 BACKUP_DIR="/var/www/rescuelink-backups"
 DATA_DIR="/var/www/rescuelink/data"
-REPO_URL="git@github.com:waynerigley/rescuelink-backups.git"
+REPO_URL="git@github.com-backup:waynerigley/rescuelink-backups.git"
 DATE=$(date +%Y-%m-%d)
 TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
 
@@ -52,14 +52,16 @@ EXPORT_EOF
 # Create latest symlink
 ln -sf "export-$DATE.json" "$BACKUP_DIR/backups/latest.json"
 
-# Check if there are changes
-if git diff --quiet && git diff --cached --quiet; then
+# Stage all changes first
+git add -A
+
+# Check if there are staged changes
+if git diff --cached --quiet; then
     echo "No changes to backup"
     exit 0
 fi
 
 # Commit and push
-git add -A
 git commit -m "Backup: $TIMESTAMP
 
 Automated daily backup of Rescue Link ID data"
