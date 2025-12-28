@@ -82,6 +82,70 @@ export const mockUsers: User[] = [
         physicianName: 'Dr. Smith',
         physicianPhone: '555-345-6789',
         lastUpdated: '2024-12-20'
+      },
+      {
+        id: 'p3',
+        slug: 'mno456pqr789stu012vwx',
+        name: 'Emma Rigley',
+        dateOfBirth: '2018-03-15',
+        bloodType: 'A+',
+        allergies: ['Dairy'],
+        medicalConditions: [],
+        medications: [],
+        emergencyContacts: [
+          { id: 'c4', name: 'Wayne Rigley', relationship: 'Father', phone: '555-123-4567', isPrimary: true },
+          { id: 'c5', name: 'Sarah Rigley', relationship: 'Mother', phone: '555-234-5678', isPrimary: false }
+        ],
+        address: '123 Main Street, Anytown, USA 12345',
+        specialInstructions: 'Lactose intolerant - no dairy products.',
+        physicianName: 'Dr. Smith',
+        physicianPhone: '555-345-6789',
+        lastUpdated: '2024-12-20'
+      },
+      {
+        id: 'p4',
+        slug: 'ghi789jkl012mno345pqr',
+        name: 'Robert Rigley',
+        dateOfBirth: '1952-11-08',
+        bloodType: 'O+',
+        allergies: ['Aspirin'],
+        medicalConditions: ['Type 2 Diabetes', 'High Blood Pressure'],
+        medications: [
+          { id: 'm3', name: 'Metformin', dosage: '500mg', frequency: 'Twice daily' },
+          { id: 'm4', name: 'Lisinopril', dosage: '10mg', frequency: 'Once daily' }
+        ],
+        emergencyContacts: [
+          { id: 'c6', name: 'Wayne Rigley', relationship: 'Son', phone: '555-123-4567', isPrimary: true },
+          { id: 'c7', name: 'Margaret Rigley', relationship: 'Wife', phone: '555-456-7890', isPrimary: false }
+        ],
+        address: '456 Oak Lane, Anytown, USA 12345',
+        specialInstructions: 'May become confused if blood sugar is low. Carries glucose tablets.',
+        physicianName: 'Dr. Johnson',
+        physicianPhone: '555-567-8901',
+        hasPacemaker: true,
+        lastUpdated: '2024-12-20'
+      },
+      {
+        id: 'p5',
+        slug: 'stu012vwx345yza678bcd',
+        name: 'Margaret Rigley',
+        dateOfBirth: '1955-04-22',
+        bloodType: 'B+',
+        allergies: [],
+        medicalConditions: ['Arthritis', 'Mild Dementia'],
+        medications: [
+          { id: 'm5', name: 'Donepezil', dosage: '10mg', frequency: 'Once daily at bedtime' },
+          { id: 'm6', name: 'Ibuprofen', dosage: '400mg', frequency: 'As needed for pain' }
+        ],
+        emergencyContacts: [
+          { id: 'c8', name: 'Wayne Rigley', relationship: 'Son', phone: '555-123-4567', isPrimary: true },
+          { id: 'c9', name: 'Robert Rigley', relationship: 'Husband', phone: '555-456-7890', isPrimary: false }
+        ],
+        address: '456 Oak Lane, Anytown, USA 12345',
+        specialInstructions: 'May not remember her address. Please call son Wayne immediately.',
+        physicianName: 'Dr. Johnson',
+        physicianPhone: '555-567-8901',
+        lastUpdated: '2024-12-20'
       }
     ]
   },
