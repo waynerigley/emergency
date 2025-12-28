@@ -26,6 +26,10 @@ export default function NewProfile() {
   const [physicianPhone, setPhysicianPhone] = useState("");
   const [hasEpiPen, setHasEpiPen] = useState(false);
   const [hasPacemaker, setHasPacemaker] = useState(false);
+  const [isDeaf, setIsDeaf] = useState(false);
+  const [isNonVerbal, setIsNonVerbal] = useState(false);
+  const [isBlind, setIsBlind] = useState(false);
+  const [usesSignLanguage, setUsesSignLanguage] = useState(false);
 
   // Medications
   const [medications, setMedications] = useState<Medication[]>([]);
@@ -106,7 +110,11 @@ export default function NewProfile() {
       physicianName: physicianName || undefined,
       physicianPhone: physicianPhone || undefined,
       hasEpiPen: hasEpiPen || undefined,
-      hasPacemaker: hasPacemaker || undefined
+      hasPacemaker: hasPacemaker || undefined,
+      isDeaf: isDeaf || undefined,
+      isNonVerbal: isNonVerbal || undefined,
+      isBlind: isBlind || undefined,
+      usesSignLanguage: usesSignLanguage || undefined
     });
 
     if (profile) {
@@ -271,6 +279,58 @@ export default function NewProfile() {
                   <span className="text-sm font-medium">Has Pacemaker</span>
                 </label>
               </div>
+            </div>
+          </div>
+
+          {/* Communication & Accessibility */}
+          <div className="bg-card-bg rounded-2xl border border-card-border p-6">
+            <h2 className="text-lg font-semibold mb-4">Communication & Accessibility</h2>
+            <p className="text-text-secondary text-sm mb-4">Check any that apply - helps first responders communicate effectively</p>
+            <div className="grid grid-cols-2 gap-4">
+              <label className="flex items-center gap-3 cursor-pointer bg-input-bg rounded-xl px-4 py-3 hover:bg-input-bg/80 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={isDeaf}
+                  onChange={(e) => setIsDeaf(e.target.checked)}
+                  className="w-5 h-5 rounded border-input-border bg-input-bg text-blue-500 focus:ring-blue-500"
+                />
+                <div>
+                  <span className="text-sm font-medium block">Deaf / Hard of Hearing</span>
+                </div>
+              </label>
+              <label className="flex items-center gap-3 cursor-pointer bg-input-bg rounded-xl px-4 py-3 hover:bg-input-bg/80 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={isNonVerbal}
+                  onChange={(e) => setIsNonVerbal(e.target.checked)}
+                  className="w-5 h-5 rounded border-input-border bg-input-bg text-blue-500 focus:ring-blue-500"
+                />
+                <div>
+                  <span className="text-sm font-medium block">Non-Verbal</span>
+                </div>
+              </label>
+              <label className="flex items-center gap-3 cursor-pointer bg-input-bg rounded-xl px-4 py-3 hover:bg-input-bg/80 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={isBlind}
+                  onChange={(e) => setIsBlind(e.target.checked)}
+                  className="w-5 h-5 rounded border-input-border bg-input-bg text-blue-500 focus:ring-blue-500"
+                />
+                <div>
+                  <span className="text-sm font-medium block">Blind / Visually Impaired</span>
+                </div>
+              </label>
+              <label className="flex items-center gap-3 cursor-pointer bg-input-bg rounded-xl px-4 py-3 hover:bg-input-bg/80 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={usesSignLanguage}
+                  onChange={(e) => setUsesSignLanguage(e.target.checked)}
+                  className="w-5 h-5 rounded border-input-border bg-input-bg text-blue-500 focus:ring-blue-500"
+                />
+                <div>
+                  <span className="text-sm font-medium block">Uses Sign Language</span>
+                </div>
+              </label>
             </div>
           </div>
 

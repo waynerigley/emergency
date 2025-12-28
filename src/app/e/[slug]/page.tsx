@@ -133,7 +133,7 @@ export default function EmergencyPage() {
         {/* Critical Alerts - EpiPen & Pacemaker */}
         {(profile.hasEpiPen || profile.hasPacemaker) && (
           <div className="px-4 pt-6">
-            <div className="flex gap-3 justify-center">
+            <div className="flex flex-wrap gap-3 justify-center">
               {profile.hasEpiPen && (
                 <div className="bg-orange-500 text-white font-bold px-4 py-2 rounded-xl flex items-center gap-2 shadow-lg">
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -148,6 +148,46 @@ export default function EmergencyPage() {
                     <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
                   </svg>
                   HAS PACEMAKER
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Communication Alerts */}
+        {(profile.isDeaf || profile.isNonVerbal || profile.isBlind || profile.usesSignLanguage) && (
+          <div className="px-4 pt-4">
+            <div className="flex flex-wrap gap-3 justify-center">
+              {profile.isDeaf && (
+                <div className="bg-blue-600 text-white font-bold px-4 py-2 rounded-xl flex items-center gap-2 shadow-lg">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.636 18.364a9 9 0 010-12.728m12.728 0a9 9 0 010 12.728m-9.9-2.829a5 5 0 010-7.07m7.072 0a5 5 0 010 7.07M13 12a1 1 0 11-2 0 1 1 0 012 0z" />
+                  </svg>
+                  DEAF / HARD OF HEARING
+                </div>
+              )}
+              {profile.isNonVerbal && (
+                <div className="bg-rose-600 text-white font-bold px-4 py-2 rounded-xl flex items-center gap-2 shadow-lg">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                  </svg>
+                  NON-VERBAL
+                </div>
+              )}
+              {profile.isBlind && (
+                <div className="bg-slate-700 text-white font-bold px-4 py-2 rounded-xl flex items-center gap-2 shadow-lg">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                  </svg>
+                  BLIND / VISUALLY IMPAIRED
+                </div>
+              )}
+              {profile.usesSignLanguage && (
+                <div className="bg-teal-600 text-white font-bold px-4 py-2 rounded-xl flex items-center gap-2 shadow-lg">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M6.672 1.911a1 1 0 10-1.932.518l.259.966a1 1 0 001.932-.518l-.26-.966zM2.429 4.74a1 1 0 10-.517 1.932l.966.259a1 1 0 00.517-1.932l-.966-.26zm8.814-.569a1 1 0 00-1.415-1.414l-.707.707a1 1 0 101.414 1.415l.708-.708zm-7.071 7.072l.707-.707A1 1 0 003.465 9.12l-.708.707a1 1 0 001.415 1.415zm3.2-5.171a1 1 0 00-1.3 1.3l4 10a1 1 0 001.823.075l1.38-2.759 3.018 3.02a1 1 0 001.414-1.415l-3.019-3.02 2.76-1.379a1 1 0 00-.076-1.822l-10-4z" clipRule="evenodd" />
+                  </svg>
+                  USES SIGN LANGUAGE
                 </div>
               )}
             </div>

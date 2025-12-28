@@ -32,6 +32,11 @@ export interface Profile {
   physicianPhone?: string;
   hasEpiPen?: boolean;
   hasPacemaker?: boolean;
+  // Communication
+  isDeaf?: boolean;
+  isNonVerbal?: boolean;
+  isBlind?: boolean;
+  usesSignLanguage?: boolean;
   lastUpdated: string;
 }
 
