@@ -5,6 +5,29 @@ import path from 'path';
 
 const DATA_DIR = '/var/www/rescuelink/data';
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
+const PROFILES_FILE = path.join(DATA_DIR, 'profiles.json');
+
+interface Profile {
+  id: string;
+  odify: string;
+  name: string;
+  userId?: string;
+  [key: string]: unknown;
+}
+
+async function getProfiles(): Promise<Profile[]> {
+  try {
+    const data = await fs.readFile(PROFILES_FILE, 'utf-8');
+    return JSON.parse(data);
+  } catch {
+    return [];
+  }
+}
+
+async function getUserProfiles(userId: string): Promise<Profile[]> {
+  const profiles = await getProfiles();
+  return profiles.filter(p => p.userId === userId);
+}
 
 // Admin user with hashed password (created at build time)
 const ADMIN_USER = {
@@ -57,7 +80,8 @@ export async function POST(request: NextRequest) {
       const isValid = await bcrypt.compare(password, ADMIN_USER.passwordHash);
       if (isValid) {
         const { passwordHash: _, ...userWithoutPassword } = ADMIN_USER;
-        return NextResponse.json({ user: userWithoutPassword });
+        const profiles = await getUserProfiles(ADMIN_USER.id);
+        return NextResponse.json({ user: { ...userWithoutPassword, profiles } });
       }
     }
 
@@ -73,7 +97,8 @@ export async function POST(request: NextRequest) {
         if (ADMIN_EMAILS.includes(email)) {
           userWithoutPassword.isAdmin = true;
         }
-        return NextResponse.json({ user: userWithoutPassword });
+        const profiles = await getUserProfiles(user.id);
+        return NextResponse.json({ user: { ...userWithoutPassword, profiles } });
       }
     }
 

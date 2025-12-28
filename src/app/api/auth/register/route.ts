@@ -91,9 +91,9 @@ export async function POST(request: NextRequest) {
     users.push(newUser);
     await saveUsers(users);
 
-    // Return user without password hash
+    // Return user without password hash, with empty profiles array
     const { passwordHash: _, ...userWithoutPassword } = newUser;
-    return NextResponse.json({ user: userWithoutPassword });
+    return NextResponse.json({ user: { ...userWithoutPassword, profiles: [] } });
   } catch (error) {
     console.error('Registration error:', error);
     return NextResponse.json(

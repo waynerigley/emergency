@@ -18,7 +18,12 @@ export default function Dashboard() {
   useEffect(() => {
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      const parsedUser = JSON.parse(storedUser);
+      // Ensure profiles array exists
+      if (!parsedUser.profiles) {
+        parsedUser.profiles = [];
+      }
+      setUser(parsedUser);
     } else {
       router.push('/login');
     }
