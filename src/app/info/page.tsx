@@ -110,6 +110,29 @@ export default function Info() {
               Indicate if the person is deaf, non-verbal, blind, or uses sign language. Helps first responders communicate effectively in emergencies.
             </p>
           </div>
+          <div className="bg-card-bg p-6 rounded-2xl border border-card-border hover:border-red-500/30 transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-red-500/5">
+            <div className="w-12 h-12 bg-orange-500/10 rounded-xl flex items-center justify-center mb-4">
+              <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Address Autocomplete</h3>
+            <p className="text-text-secondary">
+              Powered by Google Places for accurate address entry. First responders can navigate directly to your location with one tap.
+            </p>
+          </div>
+          <div className="bg-card-bg p-6 rounded-2xl border border-card-border hover:border-red-500/30 transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-red-500/5">
+            <div className="w-12 h-12 bg-pink-500/10 rounded-xl flex items-center justify-center mb-4">
+              <svg className="w-6 h-6 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Medical Devices</h3>
+            <p className="text-text-secondary">
+              Indicate if the person carries an EpiPen or has a pacemaker. Critical information displayed prominently for first responders.
+            </p>
+          </div>
         </div>
       </div>
 
