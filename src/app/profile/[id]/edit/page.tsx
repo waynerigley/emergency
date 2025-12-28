@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { User, Profile, updateProfile, EmergencyContact, Medication } from "@/lib/mockData";
+import AddressAutocomplete from "@/components/AddressAutocomplete";
 
 export default function EditProfile() {
   const router = useRouter();
@@ -238,12 +239,11 @@ export default function EditProfile() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-text-secondary mb-2">Home Address</label>
-                <input
-                  type="text"
+                <AddressAutocomplete
                   value={address}
-                  onChange={(e) => setAddress(e.target.value)}
+                  onChange={setAddress}
+                  placeholder="Start typing an address..."
                   className="w-full px-4 py-3 bg-input-bg border border-input-border rounded-xl focus:outline-none focus:border-red-500"
-                  placeholder="123 Main St, City, State 12345"
                 />
               </div>
             </div>
